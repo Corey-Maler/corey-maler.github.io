@@ -140,7 +140,7 @@ function ()
 						</pre>
                 	</div>
                 	<div class="col-lg-6">
-                		<pre style="text-aling: left">
+                		<pre style="text-align: left">
 // will be:
 function(cb)
 {
@@ -162,6 +162,39 @@ function(cb)
          });
         }
     });
+}
+                		</pre>
+                	</div>
+                </div>
+                <div class="row">
+                	<div class="col-lg-6">
+                		<pre style="text-align: left">
+@route('/user/:uid')
+@get
+function(uid)
+{
+    @send {a: uid}
+}
+
+@post
+function(uid)
+{
+    @send {b: uid * 4}
+}
+						</pre>
+                	</div>
+                	<div class="col-lg-6">
+                		<pre style="text-align: left">
+app.get('/user', function(req, res)
+{
+    var uid = ...;
+	res.send(JSON.strungify({a: uid}));
+}
+
+app.post('/user', function(req, res))
+{
+    var uid = ...;
+	res.send(JSON.stringify({b: uid}));
 }
                 		</pre>
                 	</div>
