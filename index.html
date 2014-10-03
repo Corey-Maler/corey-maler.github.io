@@ -108,6 +108,8 @@
                     <h5>Numbers</h5>
                     <pre>(\d)(?=(?:\d\d\d){2,}(?!\d))|(\d\d)(?=(?:\d\d\d)(?!\d))/$&,/g</pre>
                     <p>replace 123123123 to 123,123,123, but not: 2034</p>
+                    <h6>Tests</h6>
+                    <p>4324534 -> <script type="text/javascript">document.write("432534".replace(/(\d)(?=(?:\d\d\d){2,}(?!\d))|(\d\d)(?=(?:\d\d\d)(?!\d))/, "$&,"))</script>
                 </div>
             </div>
         </div>
