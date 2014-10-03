@@ -124,10 +124,46 @@
                 <h2>Ideas to node</h2>
                 <div class="row">
                 	<div class="col-lg-6">
-                		<pre>afsg</pre>
+                		<pre>
+@async
+function ()
+{
+    var b = 45;
+    var c = 23;
+    
+    var g <= mysql.query("sel * from bananas where b = ?", [b]);
+    var d = await mysql.query("sel * from ss where c = ?", [c]);
+    //alias
+    
+    return g.merge(d);
+}
+						</pre>
                 	</div>
                 	<div class="col-lg-6">
-                		<pre>gokkd</pre>
+                		<pre>
+// will be:
+function(cb)
+{
+    var b = 45;
+    var c = 23;
+    
+    mysql.query("sel * from bananas where b = ?", [b], function(err, g)
+    {
+        if (err) cb(err)
+        else
+        {
+         mysq.query("self * from ss where c = ?", [c], function(err, d)
+         {
+           if (err) cb(err)
+           else
+           {
+             cb(null, g.merge(d);   
+           }
+         });
+        }
+    });
+}
+                		</pre>
                 	</div>
                 </div>
             </div>
