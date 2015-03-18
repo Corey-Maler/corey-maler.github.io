@@ -3,11 +3,19 @@ var canvasSize = 200,
     radius = canvasSize*0.8/2,
     s = Snap('#svg'),
     path = "",
+    c = s.circle(centre, centre, radius),
     arc = s.path(path),    
     startY = centre-radius,
     runBtn = document.getElementById('run'),
     percDiv = document.getElementById('percent'),
     input = document.getElementById('input');
+
+    c.attr({
+    	stroke: "rgba(255, 255, 255, 0.3)",
+    	fill: "none",
+    	stroke: 3
+    })
+
 
 input.onkeyup = function(evt) {
     if(isNaN(input.value)) {
@@ -37,7 +45,7 @@ function run(percent) {
         arc.attr({
           stroke: '#3da08d',
           fill: 'none',
-          strokeWidth: 12
+          strokeWidth: 3
         });
         percDiv.innerHTML =    Math.round(val/360*100) +'%';
 
