@@ -1,13 +1,13 @@
 body {
   background: #efefef;
+  font-family: 'Share Tech', sans-serif;
 }
 
 .container {
-  width: 400px;
+  width: 200px;
   height: 200px;
   position: relative;
   margin: auto;
-  font-family: 'Share Tech', sans-serif;
   color: #444;
 }
 
