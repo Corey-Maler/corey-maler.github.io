@@ -56,9 +56,24 @@ function run(percent) {
 
 run(input.value/100);
 
+var scrollOld = 0;
+
+
 window.onscroll = function(e)
 {
    run(window.scrollY / 1000);
+
+   var sc = window.scrollY;
+
+   if (sc > 100)
+   {
+      window.scroll(0, 150);
+   }
+   if (sc < 100)
+   {
+      window.scroll(0, 0);
+   }
+
    /*
    if (window.scrollY > 50)
    	window.scroll(0, 300);
