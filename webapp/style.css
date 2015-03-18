@@ -30,14 +30,16 @@ body {
   opacity: 0.8
 }
 
+.controls
+{
+	text-align: center;
+}
+
 p, .btn {
   position: relative;
-  left: 220px;
-  width: 200px;
-  display: block;
+  display: inline-block;
   text-transform: uppercase;
   font-size: 24px;
-  top: 30px;
 }
 
 .btn {
