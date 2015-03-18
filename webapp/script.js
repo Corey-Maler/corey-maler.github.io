@@ -59,4 +59,12 @@ run(input.value/100);
 var scrollOld = 0;
 
 
+  runBtn.addEventListener('touchmove', function(event) {
+    var touch = event.targetTouches[0];
+ 
+    // Place element where the finger is
+    runBtn.style.left = touch.pageX-25 + 'px';
+    runBtn.style.top = touch.pageY-25 + 'px';
+    event.preventDefault();
+  }, false);
 /* */
