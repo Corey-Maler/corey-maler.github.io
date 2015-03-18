@@ -15,13 +15,14 @@ input.onkeyup = function(evt) {
     }
 };
 
+var oldVal = 0;
 runBtn.onclick = function() {
   run(input.value/100);
 };
 
 function run(percent) {
     var endpoint = percent*360;
-    Snap.animate(0, endpoint,   function (val) {
+    Snap.animate(oldVal, endpoint,   function (val) {
         arc.remove();
 
         var d = val,
@@ -41,6 +42,7 @@ function run(percent) {
         percDiv.innerHTML =    Math.round(val/360*100) +'%';
 
     }, 2000, mina.easeinout);  
+    oldVal = endpoint;
 }
 
 run(input.value/100);
