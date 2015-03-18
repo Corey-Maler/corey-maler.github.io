@@ -1,6 +1,13 @@
+html
+{
+	height: 100%;
+	position: relative;
+}
 body {
+	position: relative;
   background: #efefef;
   font-family: 'Share Tech', sans-serif;
+  height: 200%;
 }
 
 .container {

@@ -26,6 +26,7 @@ input.onkeyup = function(evt) {
 var oldVal = 0;
 runBtn.onclick = function() {
   run(input.value/100);
+  window.scrollTo(0, 100);
 };
 
 function run(percent) {
@@ -54,4 +55,13 @@ function run(percent) {
 }
 
 run(input.value/100);
+
+window.onscroll = function(e)
+{
+   run(window.scrollY / 1000);
+   /*
+   if (window.scrollY > 50)
+   	window.scroll(0, 300);
+	*/
+}
 /* */
