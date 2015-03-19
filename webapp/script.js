@@ -1,22 +1,13 @@
 var canvasSize = 250,
-    centre = canvasSize/2,
-    radius = canvasSize*0.8/2,
-    s = Snap('#svg'),
-    path = "",
-    circles = s.circle(centre, centre, radius),
-    arc = s.path(path),    
+    centre = 125,
+    radius = 100,    
     startY = centre-radius,
     runBtn = document.getElementById('run'),
     percDiv = document.getElementById('percent'),
-    lapsed = document.getElementById('lapsed'),
-    input = document.getElementById('input');
+    lapsed = document.getElementById('lapsed');
 
-    circles.attr({
-    	//stroke: "rgba(61,160,141, 0.1)",
-    	stroke: "rgba(255, 255, 255, 0.1)",
-        fill: "none",
-    	strokeWidth: 3
-    });
+    var svg = document.getElementById('svg');
+    var arc = document.getElementById('arc');
 
  var lastSmoke = new Date(localStorage['lastSmoke']);
 
@@ -60,29 +51,24 @@ runBtn.onclick = function() {
    localStorage['lastSmoke'] = lastSmoke;
 };
 
+
+
 function run(percent) {
     var endpoint = percent*360;
-    Snap.animate(oldVal, endpoint,   function (val) {
-        arc.remove();
 
-        var d = val,
+    endpoint = 50;
+
+    //console.log(arc);
+
+    var d = endpoint,
             dr = d-90;
             radians = Math.PI*(dr)/180,
             endx = centre + radius*Math.cos(radians),
             endy = centre + radius * Math.sin(radians),
             largeArc = d>180 ? 1 : 0;  
             path = "M"+centre+","+startY+" A"+radius+","+radius+" 0 "+largeArc+",1 "+endx+","+endy;
-  
-        arc = s.path(path);
-        arc.attr({
-          stroke: '#FFFFFF',
-          fill: 'none',
-          strokeWidth: 3
-        });
-        //percDiv.innerHTML =    Math.round(val/360*100) +'%';
 
-    }, 2000, mina.easeinout);  
-    oldVal = endpoint;
+    arc.setAttribute('d', path);
 }
 
 run(0);

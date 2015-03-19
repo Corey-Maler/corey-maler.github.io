@@ -143,9 +143,9 @@
         -webkit-text-size-adjust: 100%;
       }
     </style>
-    <script type="text/javascript" src="snap.svg-min.js"></script>
 
-      <script src="particles.min.js"></script>
+
+    <script src="particles.min.js"></script>
   </head>
 
   <body>
@@ -162,7 +162,15 @@
     <small>laps</small><br />
     <span id="lapsed">17h 32m 12s</span>
   </div>
-  <svg id="svg"></svg>
+  <svg id="svg">
+    <circle cx="125" cy="125" r="100"
+      style="stroke: #fff; fill: none; opacity: 0.5; stroke-width: 1px"
+    />
+
+    <path id="arc" d="M 100 100 L 300 100 L 200 300 z"
+        fill="none" stroke="#fff" stroke-width="3" />
+
+  </svg>
 </div>
 <div class="controls">
   <a class="btn" id="run">Smoke ;(</a>
