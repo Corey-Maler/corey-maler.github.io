@@ -5,9 +5,17 @@ html
 }
 body {
 	position: relative;
-  background: #efefef;
+  background: #16a085;
   font-family: 'Share Tech', sans-serif;
-  height: 200%;
+}
+
+#particles-js
+{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .container {
@@ -33,7 +41,7 @@ body {
   top: 90px;
   font-size: 43px;
   text-align: center;
-  color: #3da08d;
+  color: #fff;
   opacity: 0.8
 }
 
@@ -52,12 +60,14 @@ p, .btn {
 .btn {
   text-align: center;
   position: absolute;
-  background: #5fc2af;
+  background: transparent;
   color: #fff;
   width: 120px;
-  height: 37px;
-  line-height: 37px;
+  /* height: 37px; */
+  /* line-height: 37px; */
   cursor: pointer;
+  border: 1px solid;
+  padding: 10px 10px 5px;
 }
 
 input {

@@ -11,8 +11,9 @@ var canvasSize = 200,
     input = document.getElementById('input');
 
     circles.attr({
-    	stroke: "rgba(61,160,141, 0.1)",
-    	fill: "none",
+    	//stroke: "rgba(61,160,141, 0.1)",
+    	stroke: "rgba(255, 255, 255, 0.1)",
+        fill: "none",
     	strokeWidth: 3
     });
 
@@ -44,7 +45,7 @@ function run(percent) {
   
         arc = s.path(path);
         arc.attr({
-          stroke: '#3da08d',
+          stroke: '#FFFFFF',
           fill: 'none',
           strokeWidth: 3
         });
