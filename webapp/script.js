@@ -1,4 +1,4 @@
-var canvasSize = 200,
+var canvasSize = 250,
     centre = canvasSize/2,
     radius = canvasSize*0.8/2,
     s = Snap('#svg'),
@@ -8,6 +8,7 @@ var canvasSize = 200,
     startY = centre-radius,
     runBtn = document.getElementById('run'),
     percDiv = document.getElementById('percent'),
+    lapsed = document.getElementById('lapsed'),
     input = document.getElementById('input');
 
     circles.attr({
@@ -17,17 +18,46 @@ var canvasSize = 200,
     	strokeWidth: 3
     });
 
+ var lastSmoke = new Date(localStorage['lastSmoke']);
 
-input.onkeyup = function(evt) {
-    if(isNaN(input.value)) {
-      input.value = '';
-    }
-};
+ if (isNaN(lastSmoke.getTime()))
+ {
+    lastSmoke = new Date();
+ }
+
+ var hour = 60 * 60;
+
+ var ff = function()
+ {
+    var d = new Date();
+
+    var seconds = Math.floor((d - lastSmoke) / 1000);
+
+    run(seconds / hour);
+
+
+
+
+
+    var h = Math.floor(seconds / 60 / 60);
+
+    var m = Math.floor((seconds - h * 3600) / 60);
+
+    var s = (seconds % 60);
+
+    lapsed.innerHTML = h + 'h '+m+'m ' + s + 's';
+
+
+    setTimeout(ff, 1000);
+ }
+
+ ff();
+
 
 var oldVal = 0;
 runBtn.onclick = function() {
-  run(input.value/100);
-  window.scrollTo(0, 100);
+   lastSmoke = new Date();
+   localStorage['lastSmoke'] = lastSmoke;
 };
 
 function run(percent) {
@@ -49,13 +79,13 @@ function run(percent) {
           fill: 'none',
           strokeWidth: 3
         });
-        percDiv.innerHTML =    Math.round(val/360*100) +'%';
+        //percDiv.innerHTML =    Math.round(val/360*100) +'%';
 
     }, 2000, mina.easeinout);  
     oldVal = endpoint;
 }
 
-run(input.value/100);
+run(0);
 
 var scrollOld = 0;
 
