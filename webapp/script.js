@@ -56,8 +56,6 @@ runBtn.onclick = function() {
 function run(percent) {
     var endpoint = percent*360;
 
-    endpoint = 50;
-
     //console.log(arc);
 
     var d = endpoint,
