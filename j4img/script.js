@@ -121,6 +121,9 @@ window.j4img = function(img_dom) {
       e.stopPropagation();
     }
   }
+  // iOS hack
+  Container.onclick = void(0);
+
 
   var bodr = document.getElementsByTagName('body')[0];
   bodr.onmousemove = function(e) {
