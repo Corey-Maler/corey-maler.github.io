@@ -1,5 +1,6 @@
 body {
-  background: #4a5566;
+  background: #2a3344;
+  background: radial-gradient(ellipse at center, #2a3344 0%,#182028 100%);
 }
 
 #disqus_thread {
