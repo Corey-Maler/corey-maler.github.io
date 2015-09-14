@@ -16,3 +16,7 @@ body {
   color: #fff;
   font-family: "Helvetica Neue", "Segoe UI", Arial, sans-serif;
 }
+
+.head h1 {
+  font-weight: 100;
+}
