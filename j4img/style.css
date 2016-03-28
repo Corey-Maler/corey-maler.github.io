@@ -204,11 +204,6 @@ img {
   pointer-events: none;
 }
 
-.j4img_file_upload {
-  /* сука тупая */
-  /* opacity: 0; */
-  display: none !important;
-}
 
 #h {
   padding-top: 80px !important;
