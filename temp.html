@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Hello world</title>
+        <script src="./js/engine.js"></script>
+        <script src="./js/vendor.js"></script>
+        <style>
+            @keyframes color {
+                0% {
+                    color: #ff0000;
+                }
+                25% {
+                    color: #00ff00;
+                }
+                50% {
+                    color: #0000ff;
+                }
+                75% {
+                    color: #000000;
+                }
+                100% {
+                    color: #ff0000;
+                }
+            }
+            x-3dg-cube {
+                color: #f00;
+                animation: color 4s infinite;
+            }
+        </style>
+    </head>
+    <body>
+        <x-3dg width="500" height="500">
+            <x-3dg-cube id="cube" rotationy="0"/>
+        </x-3dg>
+    </body>
+
+    <script>
+        const cube = document.getElementById('cube');
+        let rotation = 0;
+        const animate = function() {
+            rotation += 0.002;
+            cube.setAttribute('rotationy', rotation);
+            window.requestAnimationFrame(animate);
+        }
+        //animate();
+    </script>
