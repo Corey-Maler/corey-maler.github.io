@@ -6,14 +6,117 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<title>256 bits visualisation</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<style>
+		body {
+			background: #333;
+			font-family: sans-serif;
+		}
+
+		h1 {
+			color: #f3f3f3;
+			font-weight: 100;
+			text-align: center;
+			font-size: 48px;
+		}
+
+		.row {
+			width: 650px;
+			margin: auto;
+			position: relative;
+			line-height: 20px;
+		}
+
+		.row::after {
+			content: attr(data-b);
+			color: #999;
+			position: absolute;
+			right: 650px;
+			font-size: 12px;
+		}
+
+		.dot,
+		.dit {
+			width: 10px;
+			height: 10px;
+			display: inline-block;
+			margin-left: 10px;
+			border-radius: 10px;
+		}
+
+		.dot {
+			background: #d5d5d5;
+		}
+
+		.dit {
+			background: #525252;
+		}
+
+		.selector {
+			display: flex;
+			width: 650px;
+			margin: auto;
+			color: #eee;
+			font-size: 14px;
+			margin-top: 20px;
+		}
+
+		.title {
+			width: 90px;
+			padding: 7px 0px;
+			color: #aaa;
+			text-align: right;
+			margin-right: 20px;
+		}
+
+		.option {
+			margin-right: 20px;
+			background: #333;
+			padding: 7px 10px;
+			border-radius: 3px;
+			cursor: pointer;
+		}
+
+		.option:hover {
+			background: #444;
+		}
+
+		.option.active {
+			background: #222;
+		}
+
+		.note {
+			width: 650px;
+			margin: 80px auto 0;
+			color: #666;
+		}
+	</style>
 </head>
 
 <body>
+	<h1>256
+		<span style="font-size: 24px">bit</span> visualisation</h1>
 	<div id="numeric"></div>
+
+	<div class="selector">
+		<div class="title">Ticks from</div>
+		<div class="option active" data-r="age" data-val="pageloaded">Page opening</div>
+		<div class="option" data-r="age" data-val="ad">0 AD</div>
+		<div class="option" data-r="age" data-val="universe">Birth of Universe</div>
+	</div>
+
+	<div class="selector">
+		<div class="title">Speed</div>
+		<div class="option active" data-r="speed" data-val="sec">1 op / sec</div>
+		<div class="option" data-r="speed" data-val="i7">i7 7700K</div>
+		<div class="option" data-r="speed" data-val="gpu">GPU</div>
+		<div class="option" data-r="speed" data-val="asic">ASIC</div>
+		<div class="option" data-r="speed" data-val="google">All power of Google</div>
+	</div>
+	<div class="note">* Please note, that shown values only represents average number of simple operations that can reproduce machine per second,
+		not actual SHA256 or whatever computations per second.</div>
 </body>
 
 <script>
-	const numeric = document.getElementById('numeric');
 
 	// ORIGINAL FROM
 	//+ Jonas Raoni Soares Silva
@@ -182,32 +285,78 @@
 		return a.concat(origin);
 	}
 
-	const sInDay = new BigNumber(24 * 60 * 60);
-	const sInYear = (new BigNumber(365)).multiply(sInDay);
+	const msInDay = new BigNumber(24 * 60 * 60);
+	const msInYear = (new BigNumber(365)).multiply(msInDay);
+	const numeric = document.getElementById('numeric');
 
-	let sinces = [];
-	let selectedSince = 1;
-	let scale = new BigNumber(1123);
+	const now = +new Date();
+
+	const shifts = {
+		'pageloaded': new BigNumber(-now),
+		'ad': (new BigNumber(1970)).multiply(msInYear),
+		'universe': (new BigNumber('13700000000')).multiply(msInYear)
+	};
+
+	const speeds = {
+		'sec': new BigNumber('0.001'),
+		'i7': new BigNumber('70000000'), // ~ 70 GFlops
+		'gpu': new BigNumber('8000000000'), // ~ 8000 GFlops
+		'asic': new BigNumber('150000000000'),
+		'google': new BigNumber('700000000000000') // based on information that Google has about 1 million servers
+	};
+
+	let selectedShift = 'pageloaded';
+	let selectedSpeed = 'sec';
 	let selectedBase = 256;
 
-	const displayNumber = (shift, n, scale) => {
-		const d = shift.multiply(sInYear).add(n).multiply(scale);
-		const arr = fillTo(BNBinary(d.intPart()), selectedBase)
-		numeric.innerHTML = arr.map(a => a ? '*': '.').join('');
-	}
+	const selectSpeed = speed => selectedSpeed = speed;
+	const selectShift = shift => selectedShift = shift;
+	const reset = r => Array.prototype.slice.call(document.querySelectorAll(`[data-r="${r}"]`)).map(e => e.classList.remove('active'));
 
-	sinces.push({ title: '0 A.D.', shift: new BigNumber(1970)}); // not so accurate
-	sinces.push({ title: 'universe born', shift: new BigNumber('13700000000')}); // definitely not accurate
-	// even in seconds time from universe born more that 64 bits number
+	const displayNumber = (shift, n, scale) => {
+		const d = shift.add(n).multiply(scale);
+		const arr = fillTo(BNBinary(d.intPart()), selectedBase)
+		const brr = arr.map(a => a ? '<div class="dot"></div>' : '<div class="dit"></div>');
+		let res = "";
+		for (let j = 0; j < 8; j++) {
+			res += j % 2 ? '<div class="row">' : `<div class="row" data-b="${(8 - j) * 32}">`;
+			for (let i = 0; i < 32; i++) {
+				res += brr[j * 32 + i];
+			}
+			res += '</div>'
+		}
+
+		numeric.innerHTML = res;
+
+	}
 
 	function loop() {
 		const n = new BigNumber((+new Date()).toString(10));
-		const shift = sinces[selectedSince].shift;
-		displayNumber(shift, n, scale);
-		//setTimeout(loop, 50);
+		const shift = shifts[selectedShift];
+		const speed = speeds[selectedSpeed];
+		displayNumber(shift, n, speed);
+		setTimeout(loop, 100);
 		//window.requestAnimationFrame(loop);
 	}
 
 	loop();
+
+	document.addEventListener('click', e => {
+		const target = e.target;
+		const r = target.dataset['r'];
+		const val = target.dataset['val'];
+		switch (target.dataset['r']) {
+			case 'age':
+				selectShift(val);
+				reset('age');
+				break;
+			case 'speed':
+				selectSpeed(val);
+				reset('speed');
+				break;
+		}
+
+		target.classList.add('active');
+	})
 </script>
 </html>
