@@ -16,16 +16,27 @@
 		numeric.innerHTML = n.toString(2);
 	}
 
+	let sinces = [];
+	let selectedSince = 1;
+
+
 	function setup() {
-
+		const now = +new Date();
+		const msInDay = 24 * 60 * 60 * 1000;
+		const msInYear = 365 * msInDay;
+		sinces.push({title: '0 A.D.', shift: 1970 * msInYear }); // not so accurate
+		sinces.push({title: 'universe born', shift: 13700000000 * msInYear}); // definitely not accurate
 	}
-
 	function loop() {
 		const n = +new Date();
-		displayNumber(n);
-		window.requestAnimationFrame(loop);	
+		const shift = sinces[selectedSince].shift;
+		console.log(n);
+		console.log(shift);
+		displayNumber(n + shift);
+		//window.requestAnimationFrame(loop);	
 	}
 
+	setup();
 	loop();
 </script>
 </html>
