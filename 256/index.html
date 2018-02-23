@@ -12,28 +12,37 @@
 
 <script>
 	const numeric = document.getElementById('numeric');
-	const displayNumber = (n) => {
-		numeric.innerHTML = n.toString(2);
+
+	// So, we need:
+	// shift in Years
+	// n in microseconds for current time
+	// scale -- how many operators per second we can do
+	// somehow we should implement next equal:
+	// (shift * msInYear + n) * scale
+	// which much bigger that Nuber.MAX_SAFE_NUMBER in js
+	const displayNumber = (shift, n, scale) => {
+		numeric.innerHTML = (Math.round(n * scale)).toString(2);
 	}
 
 	let sinces = [];
 	let selectedSince = 1;
+	let scale = 0.001;
 
 
 	function setup() {
 		const now = +new Date();
-		const msInDay = 24 * 60 * 60 * 1000;
-		const msInYear = 365 * msInDay;
-		sinces.push({title: '0 A.D.', shift: 1970 * msInYear }); // not so accurate
-		sinces.push({title: 'universe born', shift: 13700000000 * msInYear}); // definitely not accurate
+		const sInDay = 24 * 60 * 60;
+		const sInYear = 365 * sInDay;
+		sinces.push({title: '0 A.D.', shiftY: 1970, shift: 0}); // not so accurate
+		sinces.push({title: 'universe born', shiftY: 13700000000, shift: 0}); // definitely not accurate
+		// even in seconds time from universe born more that 64 bits number
 	}
 	function loop() {
 		const n = +new Date();
 		const shift = sinces[selectedSince].shift;
-		console.log(n);
-		console.log(shift);
-		displayNumber(n + shift);
-		//window.requestAnimationFrame(loop);	
+		const shiftY = sinces[selectedSince].shiftY;
+		displayNumber(shiftY, n, scale);
+		window.requestAnimationFrame(loop);	
 	}
 
 	setup();
