@@ -1,17 +1,365 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
 	<title>Document</title>
+	<style>
+		body {
+			background: #333;
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+		}
+
+		h1 {
+			color: #fff;
+			text-align: center;
+		}
+
+		.root {
+			position: relative;
+			margin: auto;
+			width: 180px;
+			height: 10px;
+		}
+
+		.root.end {
+			filter: blur(5px);
+		}
+
+		.margin {
+			background: #333;
+			position: absolute;
+			z-index: 3;
+		}
+
+		.pixel {
+			position: absolute;
+			width: 10px;
+			height: 10px;
+			border: 1px solid #464646;
+			box-sizing: border-box;
+			background: #333;
+			z-index: 1;
+			transition: all .2s ease;
+		}
+
+		.pixel.figure {
+			z-index: 2;
+		}
+
+		.active {
+			background: #999;
+			border-color: #666;
+		}
+
+		.border {
+			display: none;
+		}
+
+		.hide {
+			background: #333;
+		}
+
+		.ui {
+			width: 180px;
+			margin: auto;
+			position: relative;
+			z-index: 4;
+			text-align: center;
+		}
+
+		button {
+			margin-bottom: 20px;
+			border: none;
+			background: #666;
+			padding: 5px 20px;
+			font-size: 24px;
+			border-radius: 2px;
+			color: #fff;
+			cursor: pointer;
+		}
+
+		button:hover {
+			background: #999;
+			box-shadow: 0 0 3px #333;
+		}
+
+		.tip {
+			color: #fff;
+			padding: 17px;
+			font-family: sans-serif;
+		}
+
+		h2, h3 {
+			padding: 10px 0;
+		}
+	</style>
 </head>
+
 <body>
-	<div>
-		<div>asd</div>
+	<h1>Tetris</h1>
+	<div id="app">
+
+	</div>
+	<div class="ui" id="ui">
+		<h3 id="score-title">You score is 34</h3>
+		<button onClick="start()">Start</button>
+		<div class="tip">Use arrow keys to play</div>
 	</div>
 </body>
 <script>
-	alert(3);
+	const root = document.createElement('div');
+	root.className = 'root';
+
+	const figures = [
+		[[-1, 0], [0, 0], [1, 0], [0, 1]],
+		[[-1, 0], [0, 0], [1, 0], [2, 0]],
+		[[0, 0], [1, 0], [0, 1], [1, 1]],
+		[[-1, 0], [0, 0], [0, 1], [1, 1]],
+		[[-1, 1], [0, 1], [0, 0], [1, 0]],
+	];
+
+	const pixelSize = 10;
+	const margin = 5;
+	const pp = pixelSize + margin;
+	const w = 12;
+	const h = 22;
+	const field = [];
+	const ff = [];
+
+	let p_x = 2;
+	let p_y = 2;
+	let score = 0;
+
+
+	const figureDraw = document.createElement('div');
+	figureDraw.className = 'figure-draw';
+	root.appendChild(figureDraw);
+
+	const figurePixels = [];
+	for (let i = 0; i < 4; i++) {
+		const pixel = document.createElement('div');
+		pixel.className = 'pixel figure active';
+		figureDraw.appendChild(pixel);
+		figurePixels.push(pixel);
+	}
+
+	function margins() {
+		for (let y = 0; y < h; y++) {
+			const m = document.createElement('div');
+			m.className = 'margin';
+			m.style.left = 0;
+			m.style.width = (pp * w) + 'px';
+			m.style.top = (pp * y - margin) + 'px';
+			m.style.height = margin + 'px';
+			root.appendChild(m);
+		}
+
+		for (let x = 0; x < w; x++) {
+			const m = document.createElement('div');
+			m.className = 'margin';
+			m.style.top = 0;
+			m.style.width = margin + 'px';
+			m.style.left = (pp * x - margin) + 'px';
+			m.style.height = (h * pp) + 'px';
+			root.appendChild(m);
+		}
+	}
+	margins();
+
+	function fillRow(y) {
+		field[y] = [];
+		ff[y] = [];
+		for (let x = 0; x < w; x++) {
+			const border = x === 0 || x === (w - 1) || y === 0 || y === (h - 1);
+			field[y][x] = border;
+			const pixel = document.createElement('div');
+			pixel.className = 'pixel ';
+			if (border) {
+				pixel.className += ' border';
+			}
+			pixel.style.top = `${(pixelSize + margin) * y}px`;
+			pixel.style.left = `${(pixelSize + margin) * x}px`;
+			root.appendChild(pixel);
+			ff[y][x] = pixel;
+		}
+
+	}
+
+	const app = document.getElementById('app');
+	app.appendChild(root);
+
+	function set(x, y, val) {
+		field[y][x] = val;
+		ff[y][x].className = 'pixel ' + (val ? 'active' : 'passive');
+	}
+
+	function get(x, y) {
+		return field[y][x];
+	}
+
+	function draw() {
+		// draw current figure
+		for (let i = 0; i < 4; i++) {
+			const pixel = figurePixels[i];
+			pixel.style.left = `${(p_x + figure[i][0]) * pp}px`;
+			pixel.style.top = `${(p_y + figure[i][1]) * pp}px`;
+		}
+	}
+
+	function update() {
+		if (check(p_x, p_y + 1)) {
+			p_y += 1;
+		} else {
+			// fix it
+			for (let i = 0; i < 4; i++) {
+				set(p_x + figure[i][0], p_y + figure[i][1], true);
+			}
+			checkFilledRows();
+			spawn();
+			if (!check(p_x, p_y)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	function check(x, y, fig) {
+		const f = fig || figure;
+		return f.map(r => [r[0] + x, r[1] + y]).reduce((acc, val) => acc && (!get(val[0], val[1])), true);
+	}
+
+	function checkFilledRows() {
+		let addRows = 0;
+		let removeRows = [];
+		for (let i = 1; i < (h - 1); i++) {
+			const r = field[i].reduce((a, b) => a && b, true);
+			if (r) {
+				removeRows.push(i);
+				addRows++;
+				score ++;
+			}
+		}
+
+		let removeDoms = [];
+
+		for (let i = 0; i < removeRows.length; i++) {
+			const y = removeRows[i];
+			removeDoms.push(ff[y]);
+			for (let j = y; j > 0; j--) {
+				field[j] = field[j - 1];
+				ff[j] = ff[j - 1];
+			}
+			fillRow(1);
+		}
+
+		for (let i = 0; i < removeDoms.length; i++) {
+			removeDoms[i].forEach(a => a.className += ' hide');
+			setTimeout(() => {
+				removeDoms[i].forEach(a => root.removeChild(a));
+			}, 500);
+		}
+
+		recalculate();
+	}
+
+	function recalculate() {
+		for (let y = 0; y < h; y++) {
+			for (let x = 0; x < w; x++) {
+				const pixel = ff[y][x];
+				pixel.style.top = `${(pixelSize + margin) * y}px`;
+				pixel.style.left = `${(pixelSize + margin) * x}px`;
+			}
+		}
+	}
+
+	function move(x, y) {
+		if (check(p_x + x, p_y + y)) {
+			p_x += x;
+			p_y += y;
+		}
+		draw();
+	}
+
+	function rotate() {
+		const newFigure = figure.map(el => [-el[1], el[0]]);
+		if (check(p_x, p_y, newFigure)) {
+			figure = newFigure;
+		}
+		draw();
+	}
+
+	function spawn() {
+		p_x = w / 2;
+		p_y = 1;
+		figure = figures[Math.floor(Math.random() * figures.length)];
+	}
+
+	function loop() {
+		const notEnd = update();
+		draw();
+
+		if (notEnd) {
+			setTimeout(loop, 500);
+		} else {
+			showUI(score);
+		}
+	}
+
+	//loop();
+
+	function start() {
+		score = 0;
+		for (let y = 0; y < h; y++) {
+			clearRow(y);
+			fillRow(y);
+		}
+
+		spawn();
+		hideUI();
+		loop();
+	}
+
+	function hideUI() {
+		root.className = 'root';
+		document.getElementById('ui').style.display = 'none';
+	}
+
+	function showUI(score) {
+		root.className = 'root end';
+		document.getElementById('ui').style.display = 'block';
+		document.getElementById('score-title').innerHTML = 'Your score is ' + score;
+	}
+
+	function clearRow(y) {
+		if (ff[y]) {
+			ff[y].forEach(f => root.removeChild(f));
+		}
+	}
+
+	document.onkeydown = checkKey;
+
+	function checkKey(e) {
+		e = e || window.event;
+		if (e.keyCode == '38') {
+			// up arrow
+			// draw
+			rotate();
+		}
+		else if (e.keyCode == '40') {
+			// down arrow
+			// speed up
+			move(0, 1);
+		}
+		else if (e.keyCode == '37') {
+			move(-1, 0);
+		}
+		else if (e.keyCode == '39') {
+			// right arrow
+			move(1, 0);
+		}
+	}
 </script>
 </html>
