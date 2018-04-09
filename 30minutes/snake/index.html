@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>30 min challenge - Snake</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<style>
+		body {
+			padding: 0;
+			margin: 0;
+			color: #315a8a;
+			text-align: center;
+		}
+		#root {
+			margin: auto;
+			top: 50px;
+			width: 200px;
+			height: 200px;
+			position: relative;
+		}
+
+		.point {
+			width: 18px;
+			height: 18px;
+			border: 1px solid #efefef;
+			position: absolute;
+			box-sizing: border-box;
+		}
+
+		.apple {
+			background: rgb(137, 209, 108);
+			border-color: rgb(137, 209, 108);
+		}
+
+		.active {
+			background: #7ba5ca;
+			border-color: #7ba5ca;
+		}
+	</style>
+</head>
+<body>
+	<h1><small>30 min</small> Snake</h1>
+	<h3 id="score">Your score: 0</h3>
+	<h2 id="new-game">To start press "space"</h2>
+	<div id="root">
+	</div>
+</body>
+<script>
+	document.onkeydown = checkKey;
+	const root = document.getElementById('root');
+	const pointSize = 20;
+	const fieldSize = 10;
+
+	let field = [];
+	let head = null;
+	let tail = null;
+	let direction = {x: 1, y: 0};
+	let eat = 0;
+	let score = 0;
+	let gameStarted = false;
+	let interval;
+
+
+	const initField = _ => {
+		const size = fieldSize * fieldSize;
+		for (let i = 0; i < size; i++) {
+			const p = document.createElement('div');
+			p.className = 'point';
+			p.style.left = Math.floor(i / fieldSize) * pointSize + 'px';
+			p.style.top = Math.floor(i % fieldSize) * pointSize + 'px';
+			p.type = 'none';
+			field.push(p);
+			root.appendChild(p);
+		}
+	}
+
+	const switchPoint = (x, y, type) => {
+		let cl = 'point';
+		switch (type) {
+			case 'body': cl = 'point active'; break;
+			case 'apple': cl = 'point apple'; break;
+			case 'none': c1 = 'point'; break;
+		}
+		const point = field[x * fieldSize + y];
+		point.className = cl;
+		point.type = type;
+	}
+
+	const getType = (x, y) => {
+		return field[x * fieldSize + y].type;
+	}
+
+	const add = (x, y) => {
+		const ne = {
+			x, y, next: null,
+		};
+
+		if (head) {
+			head.next = ne;
+		} else {
+			tail = ne;
+		}
+		head = ne;
+
+		switchPoint(x, y, 'body');
+	}
+
+	const shorty = _ => {
+		switchPoint(tail.x, tail.y);
+		tail = tail.next;
+	}
+
+	const spawnApple = _ => {
+		// probably most ineffective method
+		let x;
+		let y;
+		while (true) {
+			x = Math.round(Math.random() * (fieldSize - 1));
+			y = Math.round(Math.random() * (fieldSize - 1));
+			if (getType(x, y) === 'none') {
+				break;
+			}	
+		}
+		switchPoint(x, y, 'apple');
+	}
+
+
+	const loop = _ => {
+		let newCoordinates = {x: head.x + direction.x, y: head.y + direction.y };
+		if (newCoordinates.x > fieldSize - 1) {
+			newCoordinates.x = 0;
+		}
+		if (newCoordinates.x < 0) {
+			newCoordinates.x = fieldSize - 1;
+		}
+
+		if (newCoordinates.y > fieldSize - 1) {
+			newCoordinates.y = 0;
+		}
+		if (newCoordinates.y < 0) {
+			newCoordinates.y = fieldSize - 1;
+		}
+
+		const s = getType(newCoordinates.x, newCoordinates.y);
+
+		if (s === 'apple') {
+			eat ++;
+			score++;
+			setScore();
+		}
+
+		if (s === 'body') {
+			endGame();
+			return;
+		}
+	
+		add(newCoordinates.x, newCoordinates.y);
+		if (eat === 0) {
+			shorty();
+		} else {
+			eat--;
+			spawnApple();
+		}
+	}
+
+
+	function checkKey(e) {
+		// TODO: dissalow "reverse" direction key
+		e = e || window.event;
+		let newDirection
+		if (e.keyCode == '38') {
+			newDirection = {x:  0, y: -1};
+		}
+		else if (e.keyCode == '40') {
+			// down arrow
+			newDirection = {x:  0, y:  1};
+		}
+		else if (e.keyCode == '37') {
+		// left arrow
+			newDirection = {x: -1, y:  0};
+		}
+		else if (e.keyCode == '39') {
+		// right arrow
+			newDirection = {x:  1, y:  0};
+		}
+		if (e.keyCode == '32') {
+			startGame();
+		}
+
+		if (gameStarted) {
+			if (getType(head.x + newDirection.x, head.y + newDirection.y) !== 'body') {
+				direction = newDirection;
+			}
+		}
+	}
+
+	function endGame() {
+		clearInterval(interval);
+		alert('You lose. Score is ' + score);
+		root.innerHTML = '';
+		field = [];
+		gameStarted = false;
+	}
+
+	function setScore() {
+		document.getElementById('score').innerText = 'Your score is ' + score;
+	}
+
+	function startGame() {
+		if (!gameStarted) {
+			gameStarted = true;
+			eat = 0;
+			score = 0;
+			setScore();
+			head = null;
+			tail = null;
+			initField();
+			add(3, 5);
+			add(4, 5);
+			add(5, 5);
+			spawnApple();
+	 		interval = setInterval(loop, 200);
+		}
+	}
+</script>
+</html>
