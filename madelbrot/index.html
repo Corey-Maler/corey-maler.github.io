@@ -62,7 +62,16 @@
 
         fromC([x, y])
         {
-            return [(x / W) * this.sx + this.x1, (y / H) * this.sy + this.y1];
+            return [this.fromC1(x), this.fromC2(y)];
+        }
+
+        fromC1(x)
+        {
+            return (x / W) * this.sx + this.x1;
+        }
+        fromC2(y)
+        {
+            return (y / H) * this.sy + this.y1;
         }
         /*
             function toC([i1, j1])
@@ -198,6 +207,8 @@
         ];
     }
 
+    pal[255] = [255, 255, 255];
+
 
     class Canv
     {
@@ -228,11 +239,7 @@
 
         setPix(x, y, ind)
         {
-            if (ind === -1) {
-                this.setPixel(x, y, 255, 255, 255, 255);
-            } else {
-                this.setPixel(x, y, pal[ind][0], pal[ind][1], pal[ind][2], 255);
-            }
+            this.setPixel(x, y, pal[ind][0], pal[ind][1], pal[ind][2], 255);
         }
 
         finish()
@@ -254,52 +261,39 @@
     // if it limits to infinity -- black
     // if it limits to finit number -- white
 
-    function multiply([a, b], [c, d])
-    {
-        return [a * c - d * b, b * c + a * d]
-    }
-
-    function square(a)
-    {
-        return multiply(a, a);
-    }
-
-    function add([a, b], [c, d])
-    {
-        return [a + c, b + d];
-    }
-
-    function solve(x)
-    {
-        let t = 0;
-        let z0 = [0, 0];
-        for (t = 0; t < 1000; t++) {
-            const z1 = add(square(z0), x);
-            // @NB if |Zn|^2 > 4 it's definitely not a point in set 
-            if (z1[0] * z1[0] + z1[1] * z1[1] > 100) {
-                return t % 255;
-            }
-            z0 = z1;
-        }
-
-        //return Math.max(Math.min(0, Math.abs(z0[0]) / 1), 1);
-        return -1;
-    }
-
-
     function calculate()
     {
         for (let i = 0; i < W; i++) {
             for (let j = 0; j < H; j++) {
-                // if (solve(box.fromC([i, j]))) {
-                //    canv.setPixel(i, j, 1, 1, 1, 1);
-                //}
-                const br = solve(box.fromC([i, j]));
-                //canv.setPixel(i, j, Math.floor(255 * (br)), Math.floor(255 * br), Math.floor(255 * br), 255);
-                canv.setPix(i, j, br);
+                // const br = solve(box.fromC([i, j]));
+                let t = 0;
+                let za0 = 0;
+                let zb0 = 0;
+                const xa = box.fromC1(i);
+                const xb = box.fromC2(j);
+                for (t = 0; t < 1000; t++) {
+                    const aa = za0 * za0;
+                    const bb = zb0 * zb0;
+                    const za1t = aa - bb;
+                    const zb1t = (za0 * zb0) + (za0 * zb0);
+
+                    const za1 = za1t + xa;
+                    const zb1 = zb1t + xb;
+
+                    // @NB if |Zn|^2 > 4 it's definitely not a point in set 
+                    if (aa + bb > 10000) {
+                        // return t % 255;
+                        break;
+                    }
+
+                    za0 = za1;
+                    zb0 = zb1;
+                }
+
+                // @NB this cause like 1ms increase time
+                canv.setPix(i, j, t % 255);
             }
         }
-
     }
 
     function update()
