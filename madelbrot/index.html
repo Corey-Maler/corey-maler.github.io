@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Madelbrot set</title>
+</head>
+
+<body>
+    <canvas id="canvas" width="500" height="500" />
+</body>
+<script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    const W = 500;
+    const H = W;
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.fillStyle = "rgb(255, 255, 255)";
+    function setPixel(x, y)
+    {
+        ctx.fillRect(x, y, 1, 1);
+    }
+
+    setPixel(10, 10);
+    setPixel(10, 11);
+
+    // z(n+1) = z(n)^2 + c
+    // if it limits to infinity -- black
+    // if it limits to finit number -- white
+
+    let i = 0;
+    let j = 0;
+
+    const z1 = - 2;
+    const z2 = 1;
+    const zs = z2 - z1;
+
+    const zy1 = -1.5;
+    const zy2 = 1.5;
+    const zys = zy2 - zy1;
+
+    function toC([i1, j1])
+    {
+        return [(i1 - z1) / zs * W, (j1 + zy1) / zys * H];
+    }
+
+    function fromC([x, y])
+    {
+        return [(x / W) * zs + z1, (y / H) * zys + zy1];
+    }
+
+    function multiply([a, b], [c, d])
+    {
+        return [a * c - d * b, b * c + a * d]
+    }
+
+    function square(a)
+    {
+        return multiply(a, a);
+    }
+
+    function add([a, b], [c, d])
+    {
+        return [a + c, b + d];
+    }
+
+    function solve(x)
+    {
+        let t = 0;
+        let z0 = [0, 0];
+        for (t = 0; t < 50; t++) {
+            z0 = add(square(z0), x);
+        }
+
+        return z0[0] < 10;
+    }
+
+
+    function calculate()
+    {
+        for (i = 0; i < W; i++) {
+            for (j = 0; j < H; j++) {
+                if (solve(fromC([i, j]))) {
+                    setPixel(i, j);
+                }
+            }
+        }
+    }
+
+    calculate();
+
+
+</script>
+
+</html>
