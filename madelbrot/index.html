@@ -3,23 +3,177 @@
 
 <head>
     <title>Madelbrot set</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 10px;
+        }
+
+        #selectable {
+            position: absolute;
+            border: 1px solid #ffffff91;
+            background: rgba(255, 255, 255, 0.3);
+            top: 30px;
+            left: 30px;
+            width: 50px;
+            height: 70px;
+            pointer-events: none;
+        }
+
+        .hidden {
+            display: none;
+            ;
+        }
+    </style>
+
 </head>
 
 <body>
-    <canvas id="canvas" width="500" height="500" />
+    <canvas id="canvas" width="500" height="500"></canvas>
+    <div id="selectable"></div>
+    <button onClick="reset()">reset</button>
+
 </body>
 <script>
+
+    class Box
+    {
+        constructor([x1, y1], [x2, y2])
+        {
+            this.x1 = x1;
+            this.y1 = y1;
+
+            this.x2 = x2;
+            this.y2 = y2;
+
+            this.defaults = [x1, y1, x2, y2];
+        }
+
+        get sx()
+        {
+            return this.x2 - this.x1;
+        }
+
+        get sy()
+        {
+            return this.y2 - this.y1;
+        }
+
+        fromC([x, y])
+        {
+            return [(x / W) * this.sx + this.x1, (y / H) * this.sy + this.y1];
+        }
+        /*
+            function toC([i1, j1])
+            {
+                return [(i1 - z1) / zs * W, (j1 + zy1) / zys * H];
+            }
+        */
+
+        updFromPixels(x1, x2)
+        {
+            const a1 = this.fromC(x1);
+            const a2 = this.fromC(x2);
+            this.x1 = a1[0];
+            this.y1 = a1[1];
+
+            this.x2 = a2[0];
+            this.y2 = a2[1];
+        }
+
+        reset()
+        {
+            this.x1 = this.defaults[0];
+            this.y1 = this.defaults[1];
+
+            this.x2 = this.defaults[2];
+            this.y2 = this.defaults[3];
+        }
+    }
+
+    const box = new Box([-2, -1.5], [1, 1.5]);
+
+    function reset()
+    {
+        box.reset();
+        update();
+    }
+
+    class Selectable
+    {
+        constructor(el, onUpdate)
+        {
+            this.originalElement = el;
+            this.onUpdate = onUpdate;
+
+            this.onMouseDown = this.onMouseDown.bind(this);
+            this.onMouseUp = this.onMouseUp.bind(this);
+            this.onMouseMove = this.onMouseMove.bind(this);
+
+            el.addEventListener('mousedown', this.onMouseDown);
+            el.addEventListener('mouseup', this.onMouseUp);
+            el.addEventListener('mousemove', this.onMouseMove);
+
+            this.x1 = 0;
+            this.y1 = 0;
+
+            this.select = document.getElementById('selectable');
+            this.select.classList.add('hidden');
+
+        }
+
+        onMouseDown(e)
+        {
+            this.select.classList.remove('hidden');
+            const { x, y } = e;
+            this.select.style.left = `${x}px`;
+            this.select.style.top = `${y}px`;
+
+            this.x1 = x;
+            this.y1 = y;
+        }
+
+        onMouseUp(e)
+        {
+            this.select.classList.add('hidden');
+            const { x, y } = e;
+            // @NB we have 10 pixels padding
+            box.updFromPixels([this.x1 - 10, this.y1 - 10], [x, this.y1 + (x - this.x1) - 10]);
+
+            update();
+        }
+
+        onMouseMove(e)
+        {
+            const { x, y } = e;
+            const w = x - this.x1;
+            const h = y - this.y1;
+
+            if (w > 0) {
+                this.select.style.width = `${w}px`;
+            } else {
+                this.select.style.left = `${x}px`;
+                this.select.style.width = `${Math.abs(w)}px`;
+            }
+
+            // @NB we want to have square always
+            if (w > 0) {
+                this.select.style.height = `${w}px`;
+            } else {
+                this.select.style.top = `${y}px`;
+                this.select.style.height = `${Math.abs(w)}px`;
+            }
+        }
+
+    }
+
+
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
 
     const W = 500;
     const H = W;
-
-    ctx.clearRect(0, 0, W, H);
-    ctx.fillStyle = "black";
-    ctx.fillRect(0, 0, W, H);
-
-    ctx.fillStyle = "rgb(255, 255, 255)";
+    ;
     function setPixel(x, y)
     {
         ctx.fillRect(x, y, 1, 1);
@@ -31,27 +185,6 @@
     // z(n+1) = z(n)^2 + c
     // if it limits to infinity -- black
     // if it limits to finit number -- white
-
-    let i = 0;
-    let j = 0;
-
-    const z1 = - 2;
-    const z2 = 1;
-    const zs = z2 - z1;
-
-    const zy1 = -1.5;
-    const zy2 = 1.5;
-    const zys = zy2 - zy1;
-
-    function toC([i1, j1])
-    {
-        return [(i1 - z1) / zs * W, (j1 + zy1) / zys * H];
-    }
-
-    function fromC([x, y])
-    {
-        return [(x / W) * zs + z1, (y / H) * zys + zy1];
-    }
 
     function multiply([a, b], [c, d])
     {
@@ -73,7 +206,8 @@
         let t = 0;
         let z0 = [0, 0];
         for (t = 0; t < 50; t++) {
-            z0 = add(square(z0), x);
+            const z1 = add(square(z0), x);
+            z0 = z1;
         }
 
         return z0[0] < 10;
@@ -82,18 +216,33 @@
 
     function calculate()
     {
-        for (i = 0; i < W; i++) {
-            for (j = 0; j < H; j++) {
-                if (solve(fromC([i, j]))) {
+        for (let i = 0; i < W; i++) {
+            for (let j = 0; j < H; j++) {
+                if (solve(box.fromC([i, j]))) {
                     setPixel(i, j);
                 }
             }
         }
     }
 
-    calculate();
+    function update()
+    {
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, W, H);
+
+        ctx.fillStyle = "rgb(255, 255, 255)";
+        calculate();
+    }
+
+    update();
+
+
+    const s = new Selectable(canvas, calculate);
 
 
 </script>
+
+
 
 </html>
