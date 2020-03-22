@@ -43672,17 +43672,233 @@ var textStyle = new PIXI.TextStyle({
   fontWeight: "bold",
   fill: "#666666"
 });
+var textSmallStyle = new PIXI.TextStyle({
+  fontFamily: "Arial",
+  fontSize: 12,
+  fill: "#999999"
+});
+var textStyleOriginal = new PIXI.TextStyle({
+  fontFamily: "Arial",
+  fontSize: 36,
+  fontWeight: "bold",
+  fill: "#29a5cc"
+});
 
-exports.renderNumber = function (num, ind) {
+exports.renderNumber = function (num, ind, original) {
+  if (original === void 0) {
+    original = false;
+  }
+
   var row = Math.floor(ind / 9);
   var col = ind % 9;
-  var text = new PIXI.Text(num.toFixed(0), textStyle);
+  var text = new PIXI.Text(num.toFixed(0), original ? textStyleOriginal : textStyle);
   text.x = col * consts_1.STEP + 18;
-  text.y = row * consts_1.STEP + 5;
+  text.y = row * consts_1.STEP + 8;
   return text;
 };
-},{"pixi.js":"node_modules/pixi.js/lib/pixi.es.js","./consts":"src/consts.ts"}],"src/index.ts":[function(require,module,exports) {
+
+var smallOffset = [[5, 5], [25, 5], [40, 5], [5, 25], [25, 25], [40, 25], [5, 40], [25, 40], [40, 40]];
+
+exports.renderSmallNumber = function (num, ind) {
+  var row = Math.floor(ind / 9);
+  var col = ind % 9;
+  var text = new PIXI.Text(num.toFixed(0), textSmallStyle);
+  var offset = smallOffset[num - 1];
+  text.x = col * consts_1.STEP + offset[0];
+  text.y = row * consts_1.STEP + offset[1];
+  return text;
+};
+
+exports.renderSet = function (nums, original, possible) {
+  var set = new PIXI.Container();
+
+  for (var i = 0; i < nums.length; i++) {
+    if (nums[i] === 0) {} else {
+      set.addChild(exports.renderNumber(nums[i], i, original[i] === nums[i]));
+    }
+  }
+
+  if (possible) {
+    for (var i = 0; i < possible.length; i++) {
+      var p = possible[i];
+
+      for (var _i = 0, p_1 = p; _i < p_1.length; _i++) {
+        var j = p_1[_i];
+        set.addChild(exports.renderSmallNumber(j, i));
+      }
+    }
+  }
+
+  return set;
+};
+},{"pixi.js":"node_modules/pixi.js/lib/pixi.es.js","./consts":"src/consts.ts"}],"src/mocks.ts":[function(require,module,exports) {
 "use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+}); // 0 indicates no number
+
+exports.rst1 = [[6, 2, 0, 7, 3, 8, 0, 0, 0], [3, 9, 0, 0, 0, 0, 6, 0, 6], [0, 0, 0, 0, 5, 0, 8, 0, 0], [0, 6, 0, 0, 0, 0, 0, 2, 0], [8, 7, 4, 0, 6, 3, 0, 0, 0], [0, 0, 0, 0, 4, 9, 0, 8, 6], [0, 5, 0, 3, 0, 0, 2, 0, 0], [7, 3, 2, 6, 8, 4, 1, 5, 0], [0, 0, 6, 0, 2, 0, 0, 4, 0]];
+/**
+ * should be difficult to brute force
+ */
+
+exports.antiBruteForce = [[0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 3, 0, 8, 5], [0, 0, 1, 0, 2, 0, 0, 0, 0], [0, 0, 0, 5, 0, 7, 0, 0, 0], [0, 0, 4, 0, 0, 0, 1, 0, 0], [0, 9, 0, 0, 0, 0, 0, 0, 0], [5, 0, 0, 0, 0, 0, 0, 7, 3], [0, 0, 2, 0, 1, 0, 0, 0, 0], [0, 0, 0, 0, 4, 0, 0, 0, 9]];
+exports.antiBruteForceSimplified = [[0, 0, 0, 0, 0, 0, 0, 0, 1], [0, 0, 0, 1, 0, 3, 0, 8, 5], [0, 0, 1, 0, 2, 0, 0, 0, 0], [0, 0, 0, 5, 0, 7, 0, 0, 0], [0, 0, 4, 0, 0, 0, 1, 0, 0], [0, 9, 0, 0, 0, 0, 0, 0, 0], [5, 0, 0, 0, 0, 0, 0, 7, 3], [0, 0, 2, 0, 1, 0, 0, 0, 0], [0, 0, 0, 0, 4, 0, 0, 1, 9]];
+exports.rst2 = [[7, 0, 0, 3, 9, 2, 8, 0, 0], [0, 0, 4, 5, 0, 0, 0, 0, 7], [0, 0, 0, 0, 0, 7, 3, 0, 1], [3, 0, 0, 2, 0, 0, 0, 0, 0], [0, 5, 0, 0, 0, 0, 0, 7, 0], [0, 0, 0, 0, 0, 8, 0, 0, 9], [6, 0, 9, 7, 0, 0, 0, 0, 0], [4, 0, 0, 0, 0, 5, 7, 0, 0], [0, 0, 3, 6, 2, 4, 0, 0, 8]];
+},{}],"src/solver.ts":[function(require,module,exports) {
+"use strict";
+
+var __spreadArrays = this && this.__spreadArrays || function () {
+  for (var s = 0, i = 0, il = arguments.length; i < il; i++) {
+    s += arguments[i].length;
+  }
+
+  for (var r = Array(s), k = 0, i = 0; i < il; i++) {
+    for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++) {
+      r[k] = a[j];
+    }
+  }
+
+  return r;
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+}); // 22 sec
+
+exports.solve = function (set, render) {
+  var newSet = __spreadArrays(set);
+
+  var a = getPossibleNumbers(set);
+  var seq = exports.genSequence(set, a);
+  console.log("seq", seq);
+  render(set, set, a);
+  var t1 = performance.now();
+  var solution = bruteForce(newSet, seq, a);
+  var t2 = performance.now();
+
+  if (solution) {
+    console.log("solved in ", t2 - t1, "ms");
+    console.log("solution", solution, set);
+    render(solution, set);
+  } else {
+    console.log("not solved in ", t2 - t1, "ms");
+  }
+};
+/**
+ * Generates best sequence for solution
+ * @param set
+ */
+
+
+exports.genSequence = function (set, possibleNumbers) {
+  var res = [];
+
+  for (var i = 0; i < set.length; i++) {
+    if (!set[i]) {
+      // 0 as well as undefined is "no number"
+      res.push(i);
+    }
+  } // select first number with less possibilities. They should fail first
+
+
+  return res.sort(function (a, b) {
+    return possibleNumbers[a].length - possibleNumbers[b].length;
+  });
+};
+
+var bruteForce = function bruteForce(set, seq, possibleNumber) {
+  var current = seq[0],
+      next = seq.slice(1);
+
+  if (current === undefined) {
+    console.warn("solved!");
+    return set;
+  }
+
+  var clone = __spreadArrays(set);
+
+  for (var _i = 0, _a = possibleNumber[current]; _i < _a.length; _i++) {
+    var i = _a[_i];
+
+    if (!check(clone, i, current)) {
+      continue;
+    }
+
+    clone[current] = i;
+    var res = bruteForce(clone, next, possibleNumber);
+
+    if (res) {
+      return res;
+    }
+  }
+
+  return false;
+};
+
+var check = function check(set, num, pos) {
+  var row = Math.floor(pos / 9);
+  var col = pos % 9;
+
+  for (var i = 0; i < 9; i++) {
+    if (set[i * 9 + col] === num || set[row * 9 + i] === num) {
+      return false;
+    }
+  } // check block
+
+
+  var brow = Math.floor(row / 3);
+  var bcol = Math.floor(col / 3);
+
+  for (var i = 0; i < 3; i++) {
+    for (var j = 0; j < 3; j++) {
+      if (set[(brow * 3 + j) * 9 + bcol * 3 + i] === num) {
+        return false;
+      }
+    }
+  }
+
+  return true;
+};
+
+var getPossibleNumbers = function getPossibleNumbers(set) {
+  var res = [];
+
+  for (var i = 0; i < set.length; i++) {
+    var b = [];
+
+    for (var j = 1; j <= 9; j++) {
+      if (check(set, j, i)) {
+        b.push(j);
+      }
+    }
+
+    if (b.length === 0) {
+      b.push(set[i]);
+    }
+
+    res.push(b);
+  }
+
+  return res;
+};
+},{}],"src/index.ts":[function(require,module,exports) {
+"use strict";
+
+var __spreadArrays = this && this.__spreadArrays || function () {
+  for (var s = 0, i = 0, il = arguments.length; i < il; i++) {
+    s += arguments[i].length;
+  }
+
+  for (var r = Array(s), k = 0, i = 0; i < il; i++) {
+    for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++) {
+      r[k] = a[j];
+    }
+  }
+
+  return r;
+};
 
 var __importStar = this && this.__importStar || function (mod) {
   if (mod && mod.__esModule) return mod;
@@ -43704,6 +43920,10 @@ var ui_1 = require("./ui");
 
 var consts_1 = require("./consts");
 
+var mocks_1 = require("./mocks");
+
+var solver_1 = require("./solver");
+
 var app = new PIXI.Application({
   backgroundColor: 0xffffff,
   width: consts_1.W,
@@ -43712,10 +43932,30 @@ var app = new PIXI.Application({
 });
 document.getElementById("container").appendChild(app.view);
 var grid = ui_1.buildGrid();
-app.stage.addChild(grid);
-var n = ui_1.renderNumber(5, 3);
-app.stage.addChild(n);
-},{"pixi.js":"node_modules/pixi.js/lib/pixi.es.js","./ui":"src/ui.ts","./consts":"src/consts.ts"}],"../../../../../.config/yarn/global/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+app.stage.addChild(grid); //const set = antiBruteForce.reduce((acc, el) => [...acc, ...el], []);
+// const set = rst2.reduce((acc, el) => [...acc, ...el], []);
+
+var set = mocks_1.antiBruteForceSimplified.reduce(function (acc, el) {
+  return __spreadArrays(acc, el);
+}, []);
+var lastS;
+
+function render(set, original, possibleSolutions) {
+  if (lastS) {
+    app.stage.removeChild(lastS);
+  }
+
+  lastS = ui_1.renderSet(set, original, possibleSolutions);
+  app.stage.addChild(lastS);
+}
+
+render(set, set); // solve(set, render);
+
+var runButton = document.getElementById('run');
+runButton.addEventListener('click', function () {
+  return solver_1.solve(set, render);
+});
+},{"pixi.js":"node_modules/pixi.js/lib/pixi.es.js","./ui":"src/ui.ts","./consts":"src/consts.ts","./mocks":"src/mocks.ts","./solver":"src/solver.ts"}],"../../../../../.config/yarn/global/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;

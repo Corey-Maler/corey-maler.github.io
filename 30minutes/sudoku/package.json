@@ -11,5 +11,8 @@
   },
   "dependencies": {
     "pixi.js": "^5.2.1"
+  },
+  "scripts": {
+    "start": "parcel index.html"
   }
 }

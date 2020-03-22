@@ -6,3 +6,5 @@ export const BORDER_COLOR = 0xeeeeee;
 export const BORDER_COLOR_DARK = 0xaaaaaa;
 
 export const STEP = W / 9;
+
+export type S = number[];

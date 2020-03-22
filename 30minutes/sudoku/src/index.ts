@@ -1,6 +1,8 @@
 import * as PIXI from "pixi.js";
-import { buildGrid, renderNumber } from "./ui";
-import { H, W } from "./consts";
+import { buildGrid, renderNumber, renderSet } from "./ui";
+import { H, W, S } from "./consts";
+import { rst1, rst2, antiBruteForce, antiBruteForceSimplified } from "./mocks";
+import { solve } from "./solver";
 
 const app = new PIXI.Application({
   backgroundColor: 0xffffff,
@@ -14,6 +16,24 @@ const grid = buildGrid();
 
 app.stage.addChild(grid);
 
-const n = renderNumber(5, 3);
+//const set = antiBruteForce.reduce((acc, el) => [...acc, ...el], []);
+// const set = rst2.reduce((acc, el) => [...acc, ...el], []);
+const set = antiBruteForceSimplified.reduce((acc, el) => [...acc, ...el], []);
 
-app.stage.addChild(n);
+let lastS: PIXI.Container;
+
+function render(set: S,  original: S, possibleSolutions?: number[][]) {
+  if (lastS) {
+    app.stage.removeChild(lastS);
+  }
+
+  lastS = renderSet(set, original, possibleSolutions);
+  app.stage.addChild(lastS);
+}
+
+render(set, set);
+
+// solve(set, render);
+
+const runButton = document.getElementById('run');
+runButton.addEventListener('click', () => solve(set, render));
