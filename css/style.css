@@ -73,6 +73,6 @@ a:visited {
 
 .module256 {
     width: 100%;
-    /* overflow: hidden; */
+    overflow: hidden;
     border-radius: 10px;
 }
