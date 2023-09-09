@@ -1,320 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
-<!-- reused some code from https://commons.wikimedia.org/wiki/File:Mandelbrot_Set_Image_02_by_Aokoroko.jpg-->
+  <!-- reused some code from https://commons.wikimedia.org/wiki/File:Mandelbrot_Set_Image_02_by_Aokoroko.jpg-->
 
-<head>
+  <head>
     <title>Madelbrot set</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
     <style>
-        body {
-            margin: 0;
-            padding: 10px;
-        }
+      @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,400;0,500;1,400&display=swap');
 
-        #selectable {
-            position: absolute;
-            border: 1px solid #ffffff91;
-            background: rgba(255, 255, 255, 0.3);
-            top: 30px;
-            left: 30px;
-            width: 50px;
-            height: 70px;
-            pointer-events: none;
-        }
+      body {
+        margin: auto;
+        font-family: 'Montserrat', sans-serif;
+        background: #333;
+        padding: 10px;
+      }
+      h1 {
+        color: #ffffff;
+        text-align: center;
+        margin-bottom: 0;
+      }
 
-        .hidden {
-            display: none;
-            ;
-        }
+      h2 {
+        color: #ffffff;
+        text-align: center;
+        font-size: 14px;
+      }
+
+      #selectable {
+        position: absolute;
+        border: 1px solid #ffffff91;
+        background: rgba(255, 255, 255, 0.3);
+        top: 30px;
+        left: 30px;
+        width: 50px;
+        height: 70px;
+        pointer-events: none;
+      }
+
+      .hidden {
+        display: none;
+      }
+      .content {
+        max-width: 500px;
+        margin: 20px auto;
+        position: relative;
+        aspect-ratio: 1;
+        overflow: hidden;
+      }
+
+      .content canvas {
+        /* have no clue what is a problem here
+        but parent container is always 4px bigger than canvas */
+        margin-bottom: -4px;
+
+        transform-origin: top left;
+      }
+      canvas.anim {
+        transition: transform 0.3s ease-in-out;
+      }
+
+      .grid {
+        position: absolute;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: repeat(3, 1fr);
+        gap: 2px;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: 5;
+      }
+
+      .cell {
+        background: rgba(255, 255, 255, 0.13);
+        cursor: pointer;
+        box-sizing: border-box;
+      }
+
+      .reset {
+        display: flex;
+        justify-content: center;
+      }
+      button {
+        background: #fff;
+        color: #1c1c1c;
+        border-radius: 2px;
+        padding: 9px 20px;
+        border: none;
+      }
     </style>
+  </head>
 
-</head>
+  <body>
+    <h1>Madelbrot set</h1>
+    <h2>Touch any of boxes to zoom in</h2>
+    <div class="content" id="content">
+      <div class="grid" id="grid"></div>
+      <canvas id="canvas"></canvas>
+    </div>
+    <div class="reset">
+      <button onclick="reset()">Reset</button>
+    </div>
+  </body>
 
-<body>
-    <canvas id="canvas" width="500" height="500"></canvas>
-    <div id="selectable"></div>
-    <button onClick="reset()">reset</button>
-
-</body>
-<script>
-
-    class Box
-    {
-        constructor([x1, y1], [x2, y2])
-        {
-            this.x1 = x1;
-            this.y1 = y1;
-
-            this.x2 = x2;
-            this.y2 = y2;
-
-            this.defaults = [x1, y1, x2, y2];
-        }
-
-        get sx()
-        {
-            return this.x2 - this.x1;
-        }
-
-        get sy()
-        {
-            return this.y2 - this.y1;
-        }
-
-        fromC([x, y])
-        {
-            return [this.fromC1(x), this.fromC2(y)];
-        }
-
-        fromC1(x)
-        {
-            return (x / W) * this.sx + this.x1;
-        }
-        fromC2(y)
-        {
-            return (y / H) * this.sy + this.y1;
-        }
-        /*
-            function toC([i1, j1])
-            {
-                return [(i1 - z1) / zs * W, (j1 + zy1) / zys * H];
-            }
-        */
-
-        updFromPixels(x1, x2)
-        {
-            const a1 = this.fromC(x1);
-            const a2 = this.fromC(x2);
-            this.x1 = a1[0];
-            this.y1 = a1[1];
-
-            this.x2 = a2[0];
-            this.y2 = a2[1];
-        }
-
-        reset()
-        {
-            this.x1 = this.defaults[0];
-            this.y1 = this.defaults[1];
-
-            this.x2 = this.defaults[2];
-            this.y2 = this.defaults[3];
-        }
-    }
-
-    const box = new Box([-2, -1.5], [1, 1.5]);
-
-    function reset()
-    {
-        box.reset();
-        update();
-    }
-
-    class Selectable
-    {
-        constructor(el, onUpdate)
-        {
-            this.originalElement = el;
-            this.onUpdate = onUpdate;
-
-            this.onMouseDown = this.onMouseDown.bind(this);
-            this.onMouseUp = this.onMouseUp.bind(this);
-            this.onMouseMove = this.onMouseMove.bind(this);
-
-            el.addEventListener('mousedown', this.onMouseDown);
-            el.addEventListener('mouseup', this.onMouseUp);
-            el.addEventListener('mousemove', this.onMouseMove);
-
-            this.x1 = 0;
-            this.y1 = 0;
-
-            this.select = document.getElementById('selectable');
-            this.select.classList.add('hidden');
-
-        }
-
-        onMouseDown(e)
-        {
-            this.select.classList.remove('hidden');
-            const { x, y } = e;
-            this.select.style.left = `${x}px`;
-            this.select.style.top = `${y}px`;
-
-            this.x1 = x;
-            this.y1 = y;
-        }
-
-        onMouseUp(e)
-        {
-            this.select.classList.add('hidden');
-            const { x, y } = e;
-            // @NB we have 10 pixels padding
-            box.updFromPixels([this.x1 - 10, this.y1 - 10], [x, this.y1 + (x - this.x1) - 10]);
-
-            update();
-        }
-
-        onMouseMove(e)
-        {
-            const { x, y } = e;
-            const w = x - this.x1;
-            const h = y - this.y1;
-
-            if (w > 0) {
-                this.select.style.width = `${w}px`;
-            } else {
-                this.select.style.left = `${x}px`;
-                this.select.style.width = `${Math.abs(w)}px`;
-            }
-
-            // @NB we want to have square always
-            if (w > 0) {
-                this.select.style.height = `${w}px`;
-            } else {
-                this.select.style.top = `${y}px`;
-                this.select.style.height = `${Math.abs(w)}px`;
-            }
-        }
-
-    }
-
-
-
-
-    const W = 500;
-    const H = W;
-
-    // Part of palette
-    const q = [117, 172, 209, 145, 64, 95, 149, 223, 155, 65, 178, 142, 224, 92, 93,
-        159, 199, 116, 52, 178, 214, 192, 230, 47, 198, 68, 75, 179, 0, 8, 220, 51, 69, 171, 81, 41, 95, 108,
-        20, 121, 18, 215, 15, 75, 234, 94, 198, 83, 178, 216, 183, 78, 41, 84, 119, 63, 211, 71, 123, 38,
-        223, 73, 197, 249, 126, 227, 211, 5, 36, 36, 128, 5, 151, 2, 198, 166, 197, 181, 142, 52, 174, 151,
-        244, 164, 255, 62, 173, 75, 21, 197, 126, 225, 130, 146, 244, 175, 86, 1, 180, 253, 198, 191, 50, 36,
-        233, 200, 150, 221, 176, 73, 23, 161, 71, 224, 41, 69, 139, 245, 44, 40, 68, 45, 147, 127, 73, 39,
-        156, 189, 191, 20, 19, 15, 27, 203, 206, 97, 156, 111, 189, 126, 87, 209, 209, 36, 23, 17, 15, 49,
-        172, 58, 146, 65, 93, 214, 80, 80, 168, 177, 231, 81, 122, 75, 196, 189, 141, 185, 105, 138, 152,
-        225, 171, 28, 120, 103, 29, 13, 140, 172, 20, 235, 214, 174, 237, 70, 179, 188, 127, 169, 40, 58,
-        242, 93, 32, 252, 78, 13, 26, 221, 141, 178, 25, 171, 4, 79, 231, 137, 83, 113, 230, 88, 90, 124, 18,
-        217, 194, 46, 236, 126, 32, 228, 103, 53, 206, 150, 28, 159, 237, 138, 83, 114, 58, 47, 176, 254,
-        161, 177, 138, 24, 191, 38, 59, 225, 182, 112, 250, 39, 10, 47, 2, 96, 101, 93, 21, 116, 129, 255];
-
-
-    const pal = [];
-    for (let i = 0; i < 255; i++) {
-        pal[i] = [
-            Math.round(127 + 127 * Math.cos(2 * Math.PI * (i + 227) / 255)),
-            Math.round(127 + 127 * Math.sin(2 * Math.PI * (i + 227) / 255)),
-            q[i],
-        ];
-    }
-
-    pal[255] = [255, 255, 255];
-
-
-    class Canv
-    {
-        constructor()
-        {
-            this.canvas = document.getElementById('canvas');
-            this.ctx = canvas.getContext('2d');
-        }
-
-        init()
-        {
-            this.ctx.clearRect(0, 0, W, H);
-            this.ctx.fillStyle = "black";
-            this.ctx.fillRect(0, 0, W, H);
-            this.imgData = this.ctx.getImageData(0, 0, W, H);
-            this.data = this.imgData.data;
-        }
-
-        setPixel(x, y, r, g, b, a)
-        {
-            const data = this.data;
-            const offset = (x + y * W) * 4;
-            data[offset + 0] = r;
-            data[offset + 1] = g;
-            data[offset + 2] = b;
-            data[offset + 3] = a;
-        }
-
-        setPix(x, y, ind)
-        {
-            this.setPixel(x, y, pal[ind][0], pal[ind][1], pal[ind][2], 255);
-        }
-
-        finish()
-        {
-            this.ctx.putImageData(this.imgData, 0, 0);
-        }
-    }
-
-    const canv = new Canv();
-
-    /*
-    function setPixel(imageData, x, y)
-    {
-        ctx.fillRect(x, y, 1, 1);
-    }
-    */
-
-    // z(n+1) = z(n)^2 + c
-    // if it limits to infinity -- black
-    // if it limits to finit number -- white
-
-    function calculate()
-    {
-        for (let i = 0; i < W; i++) {
-            for (let j = 0; j < H; j++) {
-                // const br = solve(box.fromC([i, j]));
-                let t = 0;
-                let za0 = 0;
-                let zb0 = 0;
-                const xa = box.fromC1(i);
-                const xb = box.fromC2(j);
-                for (t = 0; t < 1000; t++) {
-                    const aa = za0 * za0;
-                    const bb = zb0 * zb0;
-                    const za1t = aa - bb;
-                    const zb1t = (za0 * zb0) + (za0 * zb0);
-
-                    const za1 = za1t + xa;
-                    const zb1 = zb1t + xb;
-
-                    // @NB if |Zn|^2 > 4 it's definitely not a point in set 
-                    if (aa + bb > 10000) {
-                        // return t % 255;
-                        break;
-                    }
-
-                    za0 = za1;
-                    zb0 = zb1;
-                }
-
-                // @NB this cause like 1ms increase time
-                canv.setPix(i, j, t % 255);
-            }
-        }
-    }
-
-    function update()
-    {
-        canv.init();
-        var t0 = performance.now();
-        calculate();
-        var t1 = performance.now();
-        canv.finish();
-        console.log('perf:', t1 - t0)
-    }
-
-    console.log('start update');
-    update();
-
-
-    const s = new Selectable(canvas, calculate);
-
-
-</script>
-
-
-
+  <script src="script.js"></script>
 </html>
