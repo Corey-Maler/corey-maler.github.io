@@ -1,31 +1,78 @@
+/* #1abc9c */
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,400;0,500;1,400&display=swap');
+
 body {
-    width: 900px;
-    margin: auto;
+  margin: auto;
+  font-family: 'Montserrat', sans-serif;
 }
 
-.header {
-    width: 900px;
-    margin: auto;
+a {
+  color: #1abc9c;
+}
+
+a:visited {
+  color: #208873;
+}
+
+.content {
+  max-width: 900px;
+  display: flex;
+  flex-direction: column;
+  padding: 0 20px;
+  margin: auto;
+}
+
+.contacts {
+  display: flex;
+  flex-direction: column;
+}
+
+.contacts h3 {
+  font-size: 14px;
+  font-weight: 400;
+  margin-bottom: 0;
 }
 
 .header h1 {
-    font-size: 72px;
+  font-size: 42px;
+  margin: 15px 0 0;
+}
+
+.header h2 {
+  font-size: 16px;
 }
 
 .module {
-    margin-top: 40px;   
+  margin-top: 20px;
 }
 
 .module.j4img {
-    background-image: url(/assets/img/amsterdam.jpg);
-    padding-bottom: 10px;
-    background-size: cover;
+  background-image: url(../assets/img/amsterdam.jpg);
+  padding-bottom: 10px;
+  background-size: cover;
+  padding: 10px 20px;
+  border-radius: 10px;
 }
 
-.module.j4img h1.title {
-    color: #fff;
+.j4img .editor {
+  aspect-ratio: 4/3;
+  min-height: 120px;
+  margin: 20px auto;
+  background: #fff;
 }
 
 .module .links {
     color: #ccc;
+  }
+  
+.module.j4img h1.title, .j4img .links {
+  color: #fff;
+}
+
+
+.module256 {
+    width: 100%;
+    /* overflow: hidden; */
+    border-radius: 10px;
 }
