@@ -7,22 +7,17 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+    <link href="/css/style.css" rel="stylesheet" />
+
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,400;0,500;1,400&display=swap');
-
       body {
-        margin: auto;
+        margin: 0px;
         font-family: 'Montserrat', sans-serif;
-        background: #333;
-        padding: 10px;
-      }
-      h1 {
-        color: #ffffff;
-        text-align: center;
-        margin-bottom: 0;
+        background: #0096ff;
+        padding: 0px;
       }
 
-      h2 {
+      h3 {
         color: #ffffff;
         text-align: center;
         font-size: 14px;
@@ -75,7 +70,7 @@
       }
 
       .cell {
-        background: rgba(255, 255, 255, 0.13);
+        background: #0096ff66;
         cursor: pointer;
         box-sizing: border-box;
       }
@@ -94,9 +89,9 @@
     </style>
   </head>
 
-  <body>
-    <h1>Madelbrot set</h1>
-    <h2>Touch any of boxes to zoom in</h2>
+  <body class="blue">
+    <h2 class="titleH2">Madelbrot set</h2>
+    <h3>Touch any of boxes to zoom in</h3>
     <div class="content" id="content">
       <div class="grid" id="grid"></div>
       <canvas id="canvas"></canvas>
@@ -106,5 +101,5 @@
     </div>
   </body>
 
-  <script src="script.js"></script>
+  <script src="/madelbrot/script.js"></script>
 </html>

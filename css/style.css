@@ -8,11 +8,12 @@ body {
 }
 
 a {
-  color: #1abc9c;
+  color: #0096ff;
+  text-decoration: none;
 }
 
 a:visited {
-  color: #208873;
+  color: #0096ff;
 }
 
 .content {
@@ -45,6 +46,53 @@ a:visited {
 
 .module {
   margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.module.light {
+  background: #fff;
+  box-shadow: 0 0 3px rgba(0,0,0,.1);
+}
+
+.module.wide {
+  padding: 0;
+}
+
+.module.blue {
+  background: #0096ff;
+}
+
+.module.dark {
+  background: #333333;
+}
+
+.module h2, .titleH2 {
+  margin-top: 0;
+  font-size: 24px;
+  font-weight: 400;
+}
+
+.module .links {
+  margin-top: 10px;
+}
+
+.module .canvas-wrap {
+  aspect-ratio: 3/1;
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.blue h2, .dark .titleH2 {
+  color: #fff;
+}
+
+.module.blue .links a {
+  color: #fff;
 }
 
 .module.j4img {

@@ -24,8 +24,8 @@ const speeds = {
   google,
 };
 
-let selectedShift = 'ad';
-let selectedSpeed = 'sec';
+let selectedShift = 'pageloaded';
+let selectedSpeed = 'i7';
 let selectedBase = 256;
 
 const selectSpeed = (speed) => (selectedSpeed = speed);
@@ -101,8 +101,9 @@ const prepareCanvas = (parent) => {
   };
 
   const renderNumbers = () => {
-    ctx.fillStyle = '#999999';
-    ctx.font = '20px Arial';
+    ctx.fillStyle = 'rgba(255, 255, 255, .6)';
+    
+    ctx.font = `${dpr * 10}px Arial`;
     ctx.textAlign = 'right';
     const textLeft = 20 * dpr;
     ctx.fillText('256', textLeft, (padding + 2 * radius) * 1 - 1 * dpr);
@@ -130,7 +131,7 @@ const prepareCanvas = (parent) => {
         }
       }
 
-      ctx.fillStyle = pass ? 'white' : 'gray';
+      ctx.fillStyle = pass ? 'white' : 'rgba(255, 255, 255, .2)';
       ctx.fill();
     }
 

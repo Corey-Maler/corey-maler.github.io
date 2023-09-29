@@ -73,7 +73,6 @@ class Selectable {
         el.classList.add('cell');
         this.originalElement.appendChild(el);
         const callback = () => {
-          console.log('TOUCED');
           box.zoomToThird(x, y);
           //   update();
           this.animCanvas(x, y);
@@ -119,7 +118,7 @@ for (let i = 0; i < 255; i++) {
   pal[i] = [
     Math.round(127 + 127 * Math.sin((2 * Math.PI * (i + 227)) / 255)),
     Math.round(127 + 127 * Math.sin((2 * Math.PI * (i + 227)) / 255)),
-    Math.round(127 + 127 * Math.sin((2 * Math.PI * (i + 227)) / 255)),
+    255,//Math.round(127 + 127 * Math.sin((2 * Math.PI * (i + 227)) / 255)),
   ];
 }
 
@@ -161,7 +160,7 @@ class Canv {
   }
 
   setPix(x, y, ind) {
-    this.setPixel(x, y, pal[ind][0], pal[ind][1], pal[ind][2], 255);
+    this.setPixel(x, y, pal[ind][0], pal[ind][1], pal[ind][2], 200);
   }
 
   finish() {

@@ -5,31 +5,26 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>256 bits visualisation</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- import css -->
+
+    <link href="/css/style.css" rel="stylesheet" />
     <style>
       body {
-        background: #333;
-        font-family: sans-serif;
-      }
-
-      h1 {
-        color: #f3f3f3;
-        font-weight: 100;
-        text-align: center;
-        font-size: 42px;
+        background: #0096ff;
       }
 
       .title {
         width: 90px;
         padding: 7px 0px;
-        color: #aaa;
+        color: white;
         text-align: right;
         margin-right: 20px;
       }
 
-	  .content {
-		max-width: 600px;
-		margin: auto;
-	  }
+      .content {
+        max-width: 600px;
+        margin: auto;
+      }
 
       .selector {
         display: flex;
@@ -45,18 +40,18 @@
       }
 
       .option {
-        background: #333;
+        background: #0096ff;
         padding: 7px 10px;
         border-radius: 3px;
         cursor: pointer;
       }
 
       .option:hover {
-        background: #444;
+        background: #95d3ff;
       }
 
       .option.active {
-        background: #222;
+        background: #2ba7ff;
       }
 
       .note {
@@ -72,18 +67,20 @@
     </style>
   </head>
 
-  <body>
+  <body class="dark">
+    <h2 class="titleH2">
+      256<sub style="font-size: 24px">bit</sub> visualization
+    </h2>
     <div class="content">
-      <h1>256<sub style="font-size: 24px">bit</sub> visualization</h1>
       <div id="numeric"></div>
 
       <div class="configs">
         <div class="selector">
           <div class="title">Ticks from</div>
-          <div class="option" data-r="age" data-val="pageloaded">
+          <div class="option active" data-r="age" data-val="pageloaded">
             Page opening
           </div>
-          <div class="option active" data-r="age" data-val="ad">0 AD</div>
+          <div class="option" data-r="age" data-val="ad">0 AD</div>
           <div class="option" data-r="age" data-val="universe">
             Birth of Universe
           </div>
@@ -91,10 +88,8 @@
 
         <div class="selector">
           <div class="title">Using</div>
-          <div class="option active" data-r="speed" data-val="sec">
-            1 op / sec
-          </div>
-          <div class="option" data-r="speed" data-val="i7">i7 7700K</div>
+          <div class="option" data-r="speed" data-val="sec">1 op / sec</div>
+          <div class="option active" data-r="speed" data-val="i7">i7 7700K</div>
           <div class="option" data-r="speed" data-val="gpu">GPU</div>
           <div class="option" data-r="speed" data-val="asic">ASIC</div>
           <div class="option" data-r="speed" data-val="google">
@@ -105,5 +100,5 @@
     </div>
   </body>
 
-  <script src="script.js"></script>
+  <script src="/256/script.js"></script>
 </html>

@@ -12,9 +12,11 @@
     <link href="css/style.css" rel="stylesheet" />
     <script>
       function resizeIframe(obj) {
-        obj.style.height = obj.contentWindow.document.documentElement.scrollHeight + 'px';
+        obj.style.height =
+          obj.contentWindow.document.documentElement.scrollHeight + 'px';
       }
     </script>
+    <script src="/assets/field.umd.js"></script>
   </head>
 
   <body>
@@ -26,46 +28,50 @@
           <a href="https://github.com/Corey-Maler">github</a>
           <a href="https://www.linkedin.com/in/kzarvansky/">linkedin</a>
           <a href="mailto:k.zarvanskiy@outlook.com">k.zarvanskiy@outlook.com</a>
-          <span>CV? What CV?</span>
         </div>
-        <h2>Welcome. Let me show what I was up to recently</h2>
-        <p>Or not that recently. I have job to do, so unfortunately do not really update this page often.</p>
+        <h2>Showroom</h2>
       </div>
-      <article class="module">
+      <article class="module blue">
+        <h2>Dots field</h2>
+        <div
+          class="canvas-wrap"
+          style="min-height: 300px"
+          id="dots-field-root"
+        ></div>
+        <div class="links">
+          <a class="github" href="https://github.com/Corey-Maler/dots-field"
+            >Github repo</a
+          >
+        </div>
+      </article>
+      <article class="module blue">
         <iframe
-          src="256/index.html"
+          src="/256/index.html"
           frameborder="0"
           class="module256"
           scrolling="no"
           onload="resizeIframe(this)"
         ></iframe>
       </article>
-      <article class="module">
+      <article class="module blue">
         <iframe
-          src="madelbrot/index.html"
+          src="/madelbrot/index.html"
           frameborder="0"
           class="module256"
           scrolling="no"
           onload="resizeIframe(this)"
         ></iframe>
       </article>
-      <article class="module">
-        <h1>RealTime World Map</h1>
+      <article class="module blue">
+        <h2>RealTime World Map</h2>
         <div class="links">
           <a href="https://github.com/Corey-Maler/RealtimeWorldMap"
             >Github repo</a
           >
-          <span class="soon">sandbox (comming soon)</span>
         </div>
         <div
-          width="100%"
-          height="600"
-          style="
-            width: 100%;
-            aspect-ratio: 16/9;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-          "
+          class="canvas-wrap"
+          style="aspect-ratio: 16/9; margin: 10px 0; min-height: 300px;"
           id="Content"
         ></div>
         <div>
@@ -77,37 +83,51 @@
           </button>
         </div>
       </article>
-      <article class="module j4img">
-        <h1 class="title">j4img</h1>
-        <div class="links">
-          <a href="https://github.com/Corey-Maler/j4img">Github repo</a>
-          <span class="soon">sandbox (comming soon)</span>
-        </div>
+      <article class="module j4img blue">
+        <h2>j4img</h2>
         <div class="editor" id="root"></div>
-      </article>
-
-      <article class="module">
-        <h1 class="title">X-3DG</h1>
-        <small
-          >SVG-like css-based library for 3d graphics in your browser</small
-        >
         <div class="links">
-          <a href="https://github.com/Corey-Maler/x-3dg">Github repo</a>
-          <span class="soon">sandbox (comming soon)</span>
+          <a href="https://github.com/Corey-Maler/j4img">Github</a>
         </div>
-
-        <div style="margin-top: 100px; clear: both">&nbsp;</div>
       </article>
-      <article class="module">
-        <h1>Simple SoC</h1>
+
+      <article class="module light">
+        <h2>Simple SoC</h2>
         <div class="links">
           <a href="https://github.com/Corey-Maler/simple_SoC">Github repo</a>
         </div>
-        <h3>System on chip, based on Helly RISC architecture.</h3>
+        <p>System on chip, based on Helly RISC architecture.</p>
       </article>
     </main>
     <div style="margin-top: 100px; clear: both">&nbsp;</div>
   </body>
   <script src="assets/rtwmap.js"></script>
   <script src="j4img/script.js"></script>
+  <script>
+    const app = document.getElementById('dots-field-root');
+    if (app) {
+      const engine = new DotsField.Engine();
+      engine.followMouseWithElement(app);
+
+      const canvas = new DotsField.Canv(app, '#0096ff', '#ffffff');
+      const dots = DotsField.generateArea(canvas.width, canvas.height, 15, 0);
+
+      engine.registerDots(dots);
+
+      const render = () => {
+        canvas.drawBegin();
+
+        engine.dots.forEach((dot) => {
+          if (typeof dot.ref === 'number') {
+            canvas.drawPoint(dot.x, dot.y, dot.vecX, dot.vecY);
+          }
+        });
+
+        canvas.drawEnd();
+      };
+
+      engine.addRenderer(render);
+      engine.autoPlayWhenVisible(app);
+    }
+  </script>
 </html>
