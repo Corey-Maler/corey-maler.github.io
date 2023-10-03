@@ -64,23 +64,15 @@
       </article>
       <article class="module blue">
         <h2>RealTime World Map</h2>
+        <div
+          class="canvas-wrap"
+          style="aspect-ratio: 16/9; margin: 10px 0; min-height: 300px"
+          id="Globe"
+        ></div>
         <div class="links">
           <a href="https://github.com/Corey-Maler/RealtimeWorldMap"
             >Github repo</a
           >
-        </div>
-        <div
-          class="canvas-wrap"
-          style="aspect-ratio: 16/9; margin: 10px 0; min-height: 300px;"
-          id="Content"
-        ></div>
-        <div>
-          <button class="btn btn-default" onclick="eMAP.lookFar()">
-            Look from afar
-          </button>
-          <button class="btn btn-default" onclick="eMAP.lookNear(sheep1)">
-            See near
-          </button>
         </div>
       </article>
       <article class="module j4img blue">
@@ -101,9 +93,10 @@
     </main>
     <div style="margin-top: 100px; clear: both">&nbsp;</div>
   </body>
-  <script src="assets/rtwmap.js"></script>
-  <script src="j4img/script.js"></script>
+  <script src="/assets/rwm.umd.js"></script>
+  <script src="/j4img/script.js"></script>
   <script>
+    // draw dots field
     const app = document.getElementById('dots-field-root');
     if (app) {
       const engine = new DotsField.Engine();
@@ -129,5 +122,13 @@
       engine.addRenderer(render);
       engine.autoPlayWhenVisible(app);
     }
+
+    // draw globe
+    const contentEl = document.getElementById('Globe');
+    const demoEngine = new RWM.Engine(contentEl, {
+      clearColor: '#0096ff', // 0x9966ff,
+      fgColor: '#ffffff',
+    });
+    demoEngine.start();
   </script>
 </html>
